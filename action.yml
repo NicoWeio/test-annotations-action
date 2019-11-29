@@ -1,0 +1,12 @@
+name: 'Test Annotations Creator'
+description: 'Creates annotations for failing tests'
+inputs:
+  githubToken:
+    description: "GitHub token for use when authenticating with API"
+    required: true
+  reportPath:
+    description: 'Path to json file containing test errors to create annotations for'
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
