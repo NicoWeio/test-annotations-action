@@ -4,7 +4,7 @@ const fs = require('fs').promises;
 
 
 async function run() {
-  try { 
+  try {
     const ghToken = core.getInput("githubToken");
     const octokit = new github.GitHub(ghToken);
 
@@ -28,17 +28,19 @@ async function run() {
 
     //The Github Checks API requires that Annotations are not submitted in batches of more than 50
     const batchedReports = batchIt(50, reports);
+    core.info(`Adding ${reports.length} error(s) as annotations`);
 
     batchedReports.forEach(async (reports) => {
 
-      const annotations = reports.map(r => ({ 
-        path: r.file, 
-        start_line: r.line, 
-        end_line: r.line, 
-        annotation_level: "failure", 
+      const annotations = reports.map(r => ({
+        path: r.file,
+        start_line: r.line,
+        end_line: r.line,
+        annotation_level: "failure",
         message: r.message,
         title: r.title
       }));
+
 
       await octokit.checks.update({
         owner,
@@ -46,8 +48,12 @@ async function run() {
         check_run_id,
         output: { title: `${workflow} Check Run`, summary: `${annotations.length} errors(s) found`, annotations }
       });
+
+      core.info(`Finished adding ${annotations.length} annotations.`);
     });
-  } 
+
+    core.info(`Finished adding all annotations.`);
+  }
   catch (error) {
     core.setFailed(error.message);
   }
