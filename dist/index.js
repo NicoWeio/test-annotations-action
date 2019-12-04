@@ -546,7 +546,7 @@ async function run() {
     const batchedReports = batchIt(50, reports);
     core.info(`Adding ${reports.length} error(s) as annotations`);
 
-    batchedReports.forEach(async (reports) => {
+    for (const reports of batchedReports) {
 
       const annotations = reports.map(r => ({
         path: r.file,
@@ -566,7 +566,7 @@ async function run() {
       });
 
       core.info(`Finished adding ${annotations.length} annotations.`);
-    });
+    }
 
     core.info(`Finished adding all annotations.`);
   }
