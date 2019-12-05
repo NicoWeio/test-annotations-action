@@ -27,11 +27,11 @@ async function run() {
     });
 
     core.info("========== ENV ===========")
-    core.info(process.env);
+    core.info(JSON.stringify(process.env, null, 2));
     core.info("========== CHECK RUNS ===========")
-    core.info(check_runs);
+    core.info(JSON.stringify(check_runs, null, 2));
 
-    const check_run_id = check_runs[0];
+    const check_run_id = check_runs[0].id;
 
     //The Github Checks API requires that Annotations are not submitted in batches of more than 50
     const batchedReports = batchIt(50, reports);
