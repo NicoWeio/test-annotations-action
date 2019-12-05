@@ -28,6 +28,8 @@ async function run() {
 
     core.info("========== ENV ===========")
     core.info(JSON.stringify(process.env, null, 2));
+    core.info("========== GITHUB ===========")
+    core.info(JSON.stringify(github, null, 2));
     core.info("========== CHECK RUNS ===========")
     core.info(JSON.stringify(check_runs, null, 2));
 
