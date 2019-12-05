@@ -18,13 +18,20 @@ async function run() {
     const reportContent = await fs.readFile(reportPath, 'utf8');
     const reports = JSON.parse(reportContent);
 
-    const { data: { check_runs: [{ id: check_run_id }] } } = await octokit.checks.listForRef({
+    const { data: { check_runs } } = await octokit.checks.listForRef({
         owner,
         repo,
         ref,
         check_run,
         status: "in_progress"
     });
+
+    core.info("========== ENV ===========")
+    core.info(process.env);
+    core.info("========== CHECK RUNS ===========")
+    core.info(check_runs);
+
+    const check_run_id = check_runs[0];
 
     //The Github Checks API requires that Annotations are not submitted in batches of more than 50
     const batchedReports = batchIt(50, reports);
