@@ -28,18 +28,11 @@ async function run() {
         status: "in_progress"
     });
 
-    console.log("======================= CHECK RUN ENV VAR ===============")
-    console.log(checkRunNameEnvVar);
-    console.log("======================= CHECK RUN VAR PART ===============")
-    console.log(checkRunNameVarPart);
-    console.log("======================= CHECK RUNS ===============")
-    console.log(JSON.stringify(check_runs, null, 2));
-
     const check_run_id = check_runs.filter(cr => cr.name.indexOf(checkRunNameVarPart) >= 0)[0].id;
 
     //The Github Checks API requires that Annotations are not submitted in batches of more than 50
     const batchedReports = batchIt(50, reports);
-    core.info(`Adding ${reports.length} error(s) as annotations`);
+    core.info(`Adding ${reports.length} error(s) as annotations to check run with id ${check_run_id}`);
 
     for (const reports of batchedReports) {
 
