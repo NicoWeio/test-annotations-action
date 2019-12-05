@@ -7,6 +7,9 @@ inputs:
   reportPath:
     description: 'Path to json file containing test errors to create annotations for'
     required: true
+  checkRunNameEnvVar:
+    description: 'Environment variable to read to get the name of the current check run.'
+    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'

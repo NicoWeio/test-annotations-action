@@ -521,10 +521,12 @@ const fs = __webpack_require__(747).promises;
 
 async function run() {
   try {
-    const ghToken = core.getInput("githubToken");
+    const ghToken = core.getInput("githubToken", { required: true });
     const octokit = new github.GitHub(ghToken);
 
-    const reportPath = core.getInput('reportPath');
+    const reportPath = core.getInput('reportPath', { required: true });
+    const checkRunNameEnvVar = core.getInput('checkRunNameEnvVar', { required: true });
+    const checkRunName = process.env[checkRunNameEnvVar];
     const ref = github.context.sha;
     const owner = github.context.payload.repository.owner.name;
     const repo = github.context.payload.repository.name;
@@ -542,14 +544,7 @@ async function run() {
         status: "in_progress"
     });
 
-    core.info("========== ENV ===========")
-    core.info(JSON.stringify(process.env, null, 2));
-    core.info("========== GITHUB ===========")
-    core.info(JSON.stringify(github, null, 2));
-    core.info("========== CHECK RUNS ===========")
-    core.info(JSON.stringify(check_runs, null, 2));
-
-    const check_run_id = check_runs[0].id;
+    const check_run_id = check_runs.filter(cr => cr.name === checkRunName)[0].id;
 
     //The Github Checks API requires that Annotations are not submitted in batches of more than 50
     const batchedReports = batchIt(50, reports);
