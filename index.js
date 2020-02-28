@@ -15,6 +15,9 @@ async function run() {
     const ref = context.sha;
     const workflow = github.context.workflow;
     const check_run = process.env.GITHUB_WORKFLOW;
+    console.log("context",context);
+    console.log("workflow",workflow);
+    console.log("check_run",check_run);
 
     const reportContent = await fs.readFile(reportPath, 'utf8');
     const reports = JSON.parse(reportContent);
@@ -25,6 +28,8 @@ async function run() {
         check_run,
         status: "in_progress"
     });
+
+    console.log("check_runs", check_runs);
 
     const check_run_id = check_runs.filter(cr => cr.name.indexOf(checkRunNameVarPart) >= 0)[0].id;
 
