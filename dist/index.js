@@ -528,12 +528,8 @@ async function run() {
     const checkRunNameEnvVar = core.getInput('checkRunNameEnvVar', { required: true });
     const checkRunNameVarPart = process.env[checkRunNameEnvVar];
     const context = github.context;
-    const ref = context.sha;
-    const workflow = github.context.workflow;
-    const check_run = process.env.GITHUB_WORKFLOW;
-    console.log("context",context);
-    console.log("workflow",workflow);
-    console.log("check_run",check_run);
+    const ref = getSha(context);
+    const check_run = github.context.workflow;
 
     const reportContent = await fs.readFile(reportPath, 'utf8');
     const reports = JSON.parse(reportContent);
@@ -544,8 +540,6 @@ async function run() {
         check_run,
         status: "in_progress"
     });
-
-    console.log("check_runs", check_runs);
 
     const check_run_id = check_runs.filter(cr => cr.name.indexOf(checkRunNameVarPart) >= 0)[0].id;
 
@@ -568,7 +562,7 @@ async function run() {
       await octokit.checks.update({
         ...context.repo,
         check_run_id,
-        output: { title: `${workflow} Check Run`, summary: `${annotations.length} errors(s) found`, annotations }
+        output: { title: `${check_run} Check Run`, summary: `${annotations.length} errors(s) found`, annotations }
       });
 
       core.info(`Finished adding ${annotations.length} annotations.`);
@@ -595,6 +589,14 @@ const batchIt = (size, inputs) => inputs.reduce((batches, input) => {
 
   return batches;
 }, [[]]);
+
+const getSha = (context) => {
+  if (context.eventName === "pull_request") {
+    return context.payload.after;
+  } else {
+    return context.sha;
+  }
+};
 
 
 /***/ }),
