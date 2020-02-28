@@ -527,18 +527,15 @@ async function run() {
     const reportPath = core.getInput('reportPath', { required: true });
     const checkRunNameEnvVar = core.getInput('checkRunNameEnvVar', { required: true });
     const checkRunNameVarPart = process.env[checkRunNameEnvVar];
-    const ref = github.context.sha;
-    const owner = github.context.payload.repository.owner.name;
-    const repo = github.context.payload.repository.name;
-    const workflow = github.context.workflow;
-    const check_run = process.env.GITHUB_WORKFLOW;
+    const context = github.context;
+    const ref = context.sha;
+    const check_run = context.workflow;
 
     const reportContent = await fs.readFile(reportPath, 'utf8');
     const reports = JSON.parse(reportContent);
 
     const { data: { check_runs } } = await octokit.checks.listForRef({
-        owner,
-        repo,
+        ...context.repo,
         ref,
         check_run,
         status: "in_progress"
@@ -563,8 +560,7 @@ async function run() {
 
 
       await octokit.checks.update({
-        owner,
-        repo,
+        ...context.repo,
         check_run_id,
         output: { title: `${workflow} Check Run`, summary: `${annotations.length} errors(s) found`, annotations }
       });
