@@ -59,9 +59,6 @@ async function run() {
   }
 }
 
-run()
-
-
 const batchIt = (size, inputs) => inputs.reduce((batches, input) => {
   const current = batches[batches.length - 1];
 
@@ -81,3 +78,5 @@ const getSha = (context) => {
     return context.sha;
   }
 };
+
+run();
