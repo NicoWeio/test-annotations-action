@@ -13,7 +13,8 @@ async function run() {
     const checkRunNameVarPart = process.env[checkRunNameEnvVar];
     const context = github.context;
     const ref = context.sha;
-    const check_run = context.workflow;
+    const workflow = github.context.workflow;
+    const check_run = process.env.GITHUB_WORKFLOW;
 
     const reportContent = await fs.readFile(reportPath, 'utf8');
     const reports = JSON.parse(reportContent);
