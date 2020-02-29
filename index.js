@@ -77,7 +77,7 @@ const batchIt = (size, inputs) => inputs.reduce((batches, input) => {
 
 const getSha = (context) => {
   if (context.eventName === "pull_request") {
-    return context.payload.head.sha;
+    return context.payload.pull_request.head.sha;
   } else {
     return context.sha;
   }
