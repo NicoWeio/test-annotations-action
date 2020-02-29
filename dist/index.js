@@ -529,6 +529,10 @@ async function run() {
     const checkRunNameVarPart = process.env[checkRunNameEnvVar];
     const context = github.context;
     const ref = getSha(context);
+    if (!ref) {
+      console.error("Found no ref", context);
+      return process.exit(1);
+    }
     const check_run = github.context.workflow;
 
     const reportContent = await fs.readFile(reportPath, 'utf8');
