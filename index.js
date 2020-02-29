@@ -14,7 +14,7 @@ async function run() {
     const context = github.context;
     const ref = getSha(context);
     if (!ref) {
-      console.error("Found no ref", context);
+      console.error("Found no ref", JSON.stringify(context, null, 2));
       return process.exit(1);
     }
     const check_run = github.context.workflow;
@@ -77,7 +77,7 @@ const batchIt = (size, inputs) => inputs.reduce((batches, input) => {
 
 const getSha = (context) => {
   if (context.eventName === "pull_request") {
-    return context.payload.after;
+    return context.payload.head.sha;
   } else {
     return context.sha;
   }
