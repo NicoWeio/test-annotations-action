@@ -528,6 +528,7 @@ async function run() {
     const checkRunNameEnvVar = core.getInput('checkRunNameEnvVar', { required: true });
     const checkRunNameVarPart = process.env[checkRunNameEnvVar];
     const context = github.context;
+    console.error("Context", JSON.stringify(context, null, 2));
     const ref = getSha(context);
     if (!ref) {
       console.error("Found no ref", JSON.stringify(context, null, 2));
