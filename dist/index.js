@@ -528,10 +528,10 @@ async function run() {
     const checkRunNameEnvVar = core.getInput('checkRunNameEnvVar', { required: true });
     const checkRunNameVarPart = process.env[checkRunNameEnvVar];
     const context = github.context;
-    console.error("Context", JSON.stringify(context, null, 2));
+    core.debug(`Context: ${JSON.stringify(context, null, 2)}`);
     const ref = getSha(context);
     if (!ref) {
-      console.error("Found no ref", JSON.stringify(context, null, 2));
+      core.error(`Context: ${JSON.stringify(context, null, 2)}`);
       return process.exit(1);
     }
     const check_run = github.context.workflow;
@@ -576,6 +576,7 @@ async function run() {
     core.info(`Finished adding all annotations.`);
   }
   catch (error) {
+    core.error(`Context: ${JSON.stringify(github.context, null, 2)}`)
     core.setFailed(error.message);
   }
 }
@@ -594,7 +595,7 @@ const batchIt = (size, inputs) => inputs.reduce((batches, input) => {
 
 const getSha = (context) => {
   if (context.eventName === "pull_request") {
-    return context.payload.pull_request.head.sha;
+    return context.payload.pull_request.head.sha || context.payload.after;
   } else {
     return context.sha;
   }
