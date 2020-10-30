@@ -14,23 +14,42 @@ async function run() {
     const context = github.context;
     core.debug(`Context: ${JSON.stringify(context, null, 2)}`);
     const ref = getSha(context);
+
     if (!ref) {
       core.error(`Context: ${JSON.stringify(context, null, 2)}`);
       return process.exit(1);
     }
-    const check_run = github.context.workflow;
+
+    const workflow = github.context.workflow;
 
     const reportContent = await fs.readFile(reportPath, 'utf8');
     const reports = JSON.parse(reportContent);
 
-    const { data: { check_runs } } = await octokit.checks.listForRef({
-        ...context.repo,
-        ref,
-        check_run,
-        status: "in_progress"
-    });
+    let check_run_id = null;
+    let tries = 1;
 
-    const check_run_id = check_runs.filter(cr => cr.name.indexOf(checkRunNameVarPart) >= 0)[0].id;
+    while(!check_run_id && tries <= 50) {
+      const { data: { check_runs } } = await octokit.checks.listForRef({
+          ...context.repo,
+          ref,
+          check_run: workflow,
+          status: "in_progress"
+      });
+
+      const check_run = check_runs.filter(cr => cr.name.indexOf(checkRunNameVarPart) >= 0)[0];
+
+      if(check_run) {
+        check_run_id = check_run.id;
+      }
+    }
+
+    if(!check_run_id) {
+      throw new Error("Unable to find check run id after 50 tries");
+    } else {
+      console.log(`Found check_run_id after ${tries} tries: ${check_run_id}`);
+    }
+
+
 
     //The Github Checks API requires that Annotations are not submitted in batches of more than 50
     const batchedReports = batchIt(50, reports);
@@ -51,7 +70,7 @@ async function run() {
       await octokit.checks.update({
         ...context.repo,
         check_run_id,
-        output: { title: `${check_run} Check Run`, summary: `${annotations.length} errors(s) found`, annotations }
+        output: { title: `${workflow} Check Run`, summary: `${annotations.length} errors(s) found`, annotations }
       });
 
       core.info(`Finished adding ${annotations.length} annotations.`);
